@@ -16,6 +16,58 @@ This basic contract will include 2-3 functions that demonstrate their outputs on
 6. Once connected, you can deposit and withdraw funds.
 ## Note
 Ensure that the balance updates when depositing and withdrawing. If you see the balance change, it means the transaction was successful.
+## Smart Contract
+// SPDX-License-Identifier: GPL-3.0 
+pragma solidity 0.8.13;
+
+contract Assessment {
+    address payable public galera;
+    uint256 public amount;
+
+    event Deposit(uint256 amount);
+    event Withdraw(uint256 amount);
+
+    constructor(uint initAmount) payable {
+        galera = payable(msg.sender);
+        amount = initAmount;
+    }
+
+    function getamount() public view returns(uint256){
+        return amount;
+    }
+
+    function deposit(uint256 _amount) public payable {
+        uint _previousBalance = amount;
+
+        require(msg.sender == galera, "You are not the owner of this account");
+
+        amount += _amount;
+
+        assert(amount == _previousBalance + _amount);
+
+        emit Deposit(_amount);
+    }
+    
+    error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
+
+    function withdraw(uint256 _withdrawAmount) public {
+        require(msg.sender == galera, "You are not the owner of this account");
+        uint _previousBalance = amount;
+        if (amount < _withdrawAmount) {
+            revert InsufficientBalance({
+                balance: amount,
+                withdrawAmount: _withdrawAmount
+            });
+        }
+
+        
+        amount -= _withdrawAmount;
+
+        assert(balance == (_previousBalance - _withdrawAmount)); 
+
+        emit Withdraw(_withdrawAmount);
+    }
+}
 ## Template
 Template used by Metacrafters Chris (https://github.com/MetacrafterChris/SCM-Starter.git)
 ## Authors
